@@ -1,0 +1,52 @@
+﻿@model PagedList.IPagedList<NewsRssWeb.Entity.News>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+@{
+    /**/
+
+    ViewBag.Title = "Новостная лента";
+}
+
+<h3>Новостная лента</h3>
+
+@using (Html.BeginForm("Index", "RssNews", FormMethod.Get))
+{
+    <div><p>Источники ленты</p>@Html.DropDownList("GeneratorId", ViewBag.ListGenerator as SelectList, null, new { @class = "form-control" })</div>
+    <br />
+    <div>
+        @Html.RadioButton("sortOrder", "date_Desc" )
+        <span>Сортировать по дате</span>
+
+        @Html.RadioButton("sortOrder", "Title" )
+        <span>Сортировать по источнику</span>
+    </div>
+    <br />
+    <input type="submit" value="Фильтр" class="btn btn-default" />
+}
+
+<table class="table">
+    <tr>
+        <td>Источник</td>
+        <td>Название новости</td>
+        <td>Описание новости</td>
+        <td>Автор</td>
+        <td>Дата публикации</td>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td><p>@item.Generator.Name</p></td>
+            <td><a target="_blank" href="@item.Link"><p>@item.Title</p></a></td>
+            <td><p>@item.Description</p></td>
+            <td><p>@item.Author</p></td>
+            <td><p>@item.DatePublication</p></td>
+        </tr>
+    }
+
+</table>
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter, ViewBag.GeneratorId }))
